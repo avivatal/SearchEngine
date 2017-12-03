@@ -1,3 +1,5 @@
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -83,6 +85,7 @@ public class Parse {
 
     public String extractName(String s){
         s = s.substring(s.indexOf("<DOCNO>")+7, s.indexOf("</DOCNO>")).trim();
+        System.out.println("DOC ID IS"+s);
         return s;
     }
 
@@ -97,14 +100,22 @@ public class Parse {
 
                 //is date
                 if (months.containsKey(splited[j])) {
+                    if(splited.length>j+1 && splited[j+1].length()>1 && whitespaces.contains(splited[j+1].substring(splited[j+1].length()-1))){
+                        splited[j+1]=splited[j+1].substring(0,splited[j+1].length()-1);}
 
-                    if (isNumeric(splited[j + 1])) {
+                    if (splited.length>j+1 && isNumeric(splited[j + 1])) {
+
+                        if(whitespaces.contains(splited[j+1].substring(0,1)))
+                            splited[j+1]=splited[j+1].substring(1);
+                        if(whitespaces.contains(splited[j+1].substring(splited[j+1].length()-1)))
+                            splited[j+1]=splited[j+1].substring(0,splited[j+1].length()-1);
                         //MONTH DD -> DD/MM
                         if (Double.parseDouble(splited[j + 1]) > 0 && Double.parseDouble(splited[j + 1]) < 32) {
                             if (splited[j + 1].length() == 1) {
                                 splited[j + 1] = "0" + splited[j + 1];
                             }
                             parsedDocs.get(i).add(splited[j + 1] + "/" + months.get(splited[j]));
+                            System.out.println(splited[j + 1] + "/" + months.get(splited[j]));
                             j++;
                         }
                         //MONTH YYYY -> MM/YYYY
@@ -113,11 +124,12 @@ public class Parse {
                                 splited[j+1]=splited[j+1].substring(0,splited[j+1].length()-1);
                             }
                             parsedDocs.get(i).add(months.get(splited[j]) + "/" + splited[j + 1]);
+                            System.out.println(months.get(splited[j]) + "/" + splited[j + 1]);
                             j++;
                         }
                     }
                     //MONTH DD, YYYY -> DD/MM/YYYY
-                    else if (splited[j + 1].charAt(splited[j + 1].length() - 1) == ',') {
+                    else if (splited.length>j+1 && splited[j+1].length()>0 && splited[j + 1].charAt(splited[j + 1].length() - 1) == ',') {
                         //is next string DD,
                         if (isNumeric(splited[j + 1].substring(0, splited[j + 1].length() - 1))) {
                             //is next string a number between 1 to 31
@@ -128,17 +140,21 @@ public class Parse {
                                 if (splited[j + 1].length() == 1) {
                                     splited[j + 1] = "0" + splited[j + 1];
                                 }
+                                if(splited.length>j+2&& whitespaces.contains(splited[j+2].substring(splited[j+2].length()-1))){
+                                    splited[j+2]=splited[j+2].substring(0,splited[j+2].length()-1);
+                                }
                                 //is next next string a year
-                                if (isNumeric(splited[j + 2]) && splited[j + 2].length() == 4) {
+                                if (splited.length>j+2&&isNumeric(splited[j + 2]) && splited[j + 2].length() == 4) {
                                     //save as date
                                     parsedDocs.get(i).add(splited[j + 1] + "/" + months.get(splited[j]) + "/" + splited[j + 2]);
+                                    System.out.println(splited[j + 1] + "/" + months.get(splited[j]) + "/" + splited[j + 2]);
                                     j += 2;
                                 }
                             }
                         }
                     }
                     //CHECK IF "MONTH DD*" (NO YEAR, whitespace after DD) -> DD/MM
-                    else if (whitespaces.contains(splited[j + 1].substring(splited[j + 1].length() - 1))) {
+                    else if (splited.length>j+1 && splited[j + 1].length()>0 && whitespaces.contains(splited[j + 1].substring(splited[j + 1].length() - 1))) {
                         if (isNumeric(splited[j + 1].substring(0, splited[j + 1].length() - 1))) {
                             //is next string a number between 1 to 31
                             if (Integer.parseInt(splited[j + 1].substring(0, splited[j + 1].length() - 1)) > 0 && Integer.parseInt(splited[j + 1].substring(0, splited[j + 1].length() - 1)) < 32) {
@@ -149,14 +165,15 @@ public class Parse {
                                     splited[j + 1] = "0" + splited[j + 1];
                                 }
                                 parsedDocs.get(i).add(splited[j + 1] + "/" + months.get(splited[j]));
+                                System.out.println(splited[j + 1] + "/" + months.get(splited[j]));
                                 j++;
                             }
                         }
                     }
-                } else if (months.containsKey(splited[j + 1])) {
+                } else if (splited.length> j+1&& months.containsKey(splited[j + 1]) && !whitespaces.contains(splited[j].substring(splited[j].length()-1))) {
 
                     //DDth MONTH YYYY -> DD/MM/YYYY
-                    if (splited[j].substring(splited[j].length() - 2).equals("th")) {
+                    if (splited[j].length()>2 && splited[j].substring(splited[j].length() - 2).equals("th")) {
                         if (isNumeric(splited[j].substring(0, splited[j].length() - 2))) {
                             //is next string a number between 1 to 31
                             if (Integer.parseInt(splited[j].substring(0, splited[j].length() - 2)) > 0 && Integer.parseInt(splited[j].substring(0, splited[j].length() - 2)) < 32) {
@@ -167,7 +184,12 @@ public class Parse {
                         }
                     }
                     if (isNumeric(splited[j])) {
-
+                        System.out.println(splited[j]);
+                        System.out.println(splited[j+1]);
+                        if(whitespaces.contains(splited[j].substring(0,1)))
+                            splited[j]=splited[j].substring(1);
+                        if(whitespaces.contains(splited[j].substring(splited[j].length()-1)))
+                            splited[j]=splited[j].substring(0,splited[j].length()-1);
                         if (Integer.parseInt(splited[j]) > 0 && Integer.parseInt(splited[j]) < 32) {
                             //add zero if D and not DD
                             if (splited[j].length() == 1) {
@@ -180,14 +202,17 @@ public class Parse {
                                 }
                                 //save as date - DD MONTH YYYY -> DD/MM/YYYY
                                 parsedDocs.get(i).add(splited[j] + "/" + months.get(splited[j + 1]) + "/" + splited[j + 2]);
+                                System.out.println(splited[j] + "/" + months.get(splited[j + 1]) + "/" + splited[j + 2]);
                                 j += 2;
                             } else if (isNumeric(splited[j + 2]) && splited[j + 2].length() == 2) {
                                 //save as date - DD MONTH YY -> DD/MM/YYYY
                                 parsedDocs.get(i).add(splited[j] + "/" + months.get(splited[j + 1]) + "/" + "19" + splited[j + 2]);
+                                System.out.println(splited[j] + "/" + months.get(splited[j + 1]) + "/" + "19" + splited[j + 2]);
                                 j += 2;
                             } else {
                                 //save as date - DD MONTH -> DD/MM
                                 parsedDocs.get(i).add(splited[j] + "/" + months.get(splited[j + 1]));
+                                System.out.println(splited[j] + "/" + months.get(splited[j + 1]));
                                 j++;
                             }
                         }
@@ -202,29 +227,45 @@ public class Parse {
                         if(!stopwords.contains(splited[j])){
 
                             parsedDocs.get(i).add(splited[j].toLowerCase());
+                            System.out.println(splited[j].toLowerCase());
                         }
                     }
                 }
 
                 //capital lettered expressions
+                //if the first letter is in uppercase, or the first char is a whitespace and the second char is uppercase
                 else if ((splited[j].length()>1 && Character.isUpperCase(splited[j].charAt(0))) || (splited[j].length()>2 && whitespaces.contains(splited[j].substring(0,1)) && Character.isUpperCase(splited[j].charAt(1)))) {
-                    String expression = splited[j].toLowerCase();
+
+                    //if first char is whitespace - remove it
                     if (whitespaces.contains(splited[j].substring(0,1))) {
-                        expression = expression.substring(1);
+                        splited[j] = splited[j].substring(1);
                     }
 
                     //check next word
                     boolean bool = true;
                     if (whitespaces.contains(splited[j].substring(splited[j].length() - 1))) {
-                        bool = false; //there is a whitespace after current word
+                        splited[j]=splited[j].substring(0,splited[j].length() - 1);
+                        bool = false; //there is a whitespace after current word- end of expression
                     }
+                    String expression = splited[j].toLowerCase();
                     int index = j;
 
                     while (bool) {
-                        if (splited.length > index + 1 && Character.isUpperCase(splited[index + 1].charAt(0)) && !months.containsKey(splited[index+1])) {
-                            expression +=" "+ splited[index + 1].toLowerCase();
-                            index++;
-                        } else if (splited.length > index + 2 && splited[index+1].equals("of")) {
+                        //if next word starts with uppercase and isnt a month
+                        if (splited.length > index + 1 && splited[index + 1].length()>0 && Character.isUpperCase(splited[index + 1].charAt(0)) && !months.containsKey(splited[index+1])) {
+
+                            if (splited.length > index + 1 && whitespaces.contains(splited[index + 1].substring(splited[index + 1].length() - 1))) {
+                                bool = false;
+                                expression +=" "+ splited[index + 1].toLowerCase().substring(0,splited[index + 1].length()-1);
+                                index++;
+                            }
+                            else{
+                                expression +=" "+ splited[index + 1].toLowerCase();
+                                index++;
+                            }
+                        }
+                        //if next word is "of" check next word
+                        else if (splited.length > index + 2 && splited[index+1].equals("of")) {
                             int counter=index;
                             while(splited[counter+2].equals(" ") || splited[counter+2].equals("")){
                                 counter++;
@@ -233,29 +274,34 @@ public class Parse {
                                 expression +=" "+ splited[index + 1].toLowerCase();
                                 index=counter+1;
                             }
+                            else{ bool=false;} //next word after 'of' isnt upper case
                         } else {
-                            if(splited[index+1].equals(" ")){
+                            if(splited.length>index+1 && splited[index+1].equals(" ")){
                                 index++;
                             }
                             else{
                                 bool = false;
                             }
                         }
+                        /*
                         if (splited.length > index + 1 && whitespaces.contains(splited[index + 1].substring(splited[index + 1].length() - 1))) {
                             bool = false;
-                        }
+                        }*/
                     }
+                    /*
                     if (whitespaces.contains(expression.substring(expression.length() - 1))) {
                         expression = expression.substring(0, expression.length() - 1);
-                    }
+                    }*/
                     if(!stopwords.contains(expression)) {
                         parsedDocs.get(i).add(expression);
+                        System.out.println(expression);
                     }
                     if (index != j) {
 
                         for (String s : expression.split(" ")) {
                             if(!stopwords.contains(s)) {
                                 parsedDocs.get(i).add(s);
+                                System.out.println(s);
                             }
                         }
                         j = index;
@@ -264,11 +310,16 @@ public class Parse {
 
                 //is number
                 else if (isNumeric(splited[j])) {
-
-                    //is number with commas
+                    if(splited[j].length()>0 && whitespaces.contains(splited[j].substring(0,1))){
+                        splited[j]=splited[j].substring(1);
+                    }
+                    if(splited[j].length()>0 && whitespaces.contains(splited[j].substring(splited[j].length()-1))) {
+                        splited[j] = splited[j].substring(0, splited[j].length() - 1);
+                    }
 
                     //is decimal number
                     if (splited[j].contains(".")) {
+                        System.out.println(splited[j]);
                         BigDecimal bd = new BigDecimal(splited[j]);
                         bd = bd.setScale(2, RoundingMode.HALF_UP);
                         splited[j] = bd.toString();
@@ -277,21 +328,21 @@ public class Parse {
                         }
                     }
 
-
-
                     //is percent (word)
-                    if (splited[j + 1].equals("percent") || splited[j + 1].equals("percentage")) {
+                    if (splited.length>j+1 && (splited[j + 1].equals("percent") || splited[j + 1].equals("percentage"))) {
                         parsedDocs.get(i).add(splited[j] + " percent");
+                        System.out.println(splited[j] + " percent");
                         j++;
                     }
                     else{
                         parsedDocs.get(i).add(splited[j]);
+                        System.out.println(splited[j]);
                     }
 
 
                 }
                 //is percent
-                else if (splited[j].charAt(splited[j].length() - 1) == '%') {
+                else if (splited[j].length()>1&& splited[j].charAt(splited[j].length() - 1) == '%' || (splited[j].length()>2&&whitespaces.contains(splited[j].substring(splited[j].length() - 1)) && splited[j].charAt(splited[j].length() - 2) == '%')) {
                     //is decimal
                     if (splited[j].contains(".")) {
                         BigDecimal bd = new BigDecimal(splited[j].substring(0, splited[j].length() - 1));
@@ -301,35 +352,44 @@ public class Parse {
                             splited[j]=splited[j].substring(0,splited[j].length()-1);
                         }
                         parsedDocs.get(i).add(splited[j] + " percent");
+                        System.out.println(splited[j] + " percent");
                     } else {
                         parsedDocs.get(i).add(splited[j].substring(0, splited[j].length() - 1) + " percent");
+                        System.out.println(splited[j].substring(0, splited[j].length() - 1) + " percent");
                     }
 
                 }
 
                 //number with commas
                 else if (splited[j].contains(",")) {
+                    if(whitespaces.contains(splited[j].substring(splited[j].length()-1))){
+                        splited[j]=splited[j].substring(0,splited[j].length()-1);
+                    }
                     String tempNoCommas = splited[j];
-                    if (isNumeric(tempNoCommas.replaceAll(",", ""))) {
+                    tempNoCommas=tempNoCommas.replaceAll(",", "");
+                    if (isNumeric(tempNoCommas)) {
                         //decimal
                         if (tempNoCommas.contains(".")) {
+                            System.out.println(tempNoCommas);
                             BigDecimal bd = new BigDecimal(tempNoCommas);
                             bd = bd.setScale(2, RoundingMode.HALF_UP);
                             tempNoCommas = bd.toString();
                         }
                         parsedDocs.get(i).add(tempNoCommas);
+                        System.out.println(tempNoCommas);
                     }
                 }
                 else if(!splited[j].equals("")){
                     if(whitespaces.contains(splited[j].substring(0,1))){
                         splited[j]=splited[j].substring(1);
                     }
-                    if(whitespaces.contains(splited[j].substring(splited[j].length()-1))){
+                    if(splited[j].length()>0 && whitespaces.contains(splited[j].substring(splited[j].length()-1))){
                         splited[j]=splited[j].substring(0,splited[j].length()-1);
                     }
                     if(!stopwords.contains(splited[j])){
 
                         parsedDocs.get(i).add(splited[j].toLowerCase());
+                        System.out.println(splited[j].toLowerCase());
                     }
                 }
             }
@@ -338,8 +398,15 @@ public class Parse {
 
 
 
-    public static boolean isNumeric(String str)
+    public boolean isNumeric(String str)
     {
+
+        if(str.length()>0 && whitespaces.contains(str.substring(0,1))){
+            str=str.substring(1);
+        }
+        if(str.length()>0 && whitespaces.contains(str.substring(str.length()-1))) {
+            str = str.substring(0, str.length() - 1);
+        }
         try
         {
             double d = Double.parseDouble(str);

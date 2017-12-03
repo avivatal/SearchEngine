@@ -42,18 +42,29 @@ public class ReadFile
         File corpusFolder = new File(corpusPath);
         File[] listOfFiles = corpusFolder.listFiles();
 
+        for(int i=0; i<3&& i<listOfFiles.length; i++){
+            Scanner scanner = new Scanner(new File(listOfFiles[counter].getPath()+"/"+listOfFiles[counter].getName())).useDelimiter("\\A");
 
+            if(scanner.hasNext()) {
+                String currentDoc = "";
+                currentDoc = scanner.next();
 
-        for(int i=0; i<3 && i<listOfFiles.length; i++){
-            String currentDoc=new Scanner(new File(listOfFiles[counter].getPath()+"/"+listOfFiles[counter].getName())).useDelimiter("\\A").next();
-            String[] docs = currentDoc.split("<DOC>");
-            for (int j=1; j<docs.length; j++) {
-                documents.add(docs[j]);
+                String[] docs = currentDoc.split("<DOC>");
+                for (int j=1; j<docs.length; j++) {
+                    documents.add(docs[j]);
+                }
+                counter++;
             }
-            counter++;
+
         }
         Parse parser=new Parse();
-        parser.parse(documents,stopwords);
+        try {
+            parser.parse(documents, stopwords);
+            System.out.println("done1");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }
