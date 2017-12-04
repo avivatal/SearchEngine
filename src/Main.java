@@ -1,4 +1,3 @@
-import com.sun.xml.internal.xsom.impl.Ref;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,8 +13,8 @@ public class Main {
 
     public static void main(String[] args){
 
-        String corpusPath="C:/Users/aviva/Desktop/Corpus";
-        String stopwordsPath="C:/Users/aviva/Desktop/stopwords";
+        String corpusPath="C:/Users/talshemt/Downloads/corpus";
+        String stopwordsPath="C:/Users/talshemt/Downloads/stop_words.txt";
         File corpusFolder = new File(corpusPath);
         File[] listOfFiles = corpusFolder.listFiles();
 
@@ -39,6 +38,7 @@ public class Main {
         ReadFile rf = new ReadFile();
         Parse parser = new Parse();
         Stemmer stemmer = new Stemmer();
+        Indexer indexer = new Indexer();
 
         for(int i=0; i<listOfFiles.length; i++) {
 
@@ -50,9 +50,9 @@ public class Main {
                 //parse docs in current file
                 parser.parse(extractDocs,stopwords);
                 ArrayList<ArrayList<String>> parseddocs=parser.getParsedDocs();
-
+/*
                 //stem
-                //stemmedTerms - for each term we save a list of docs it appears in (with additional properties)
+                //stemmedTerms - for each term we save a map of docs and properties of term in that doc
                 HashMap<String, HashMap<String,TermInDoc>> stemmedTerms = new HashMap<>();
                 //iterate over all docs in file
                 for (ArrayList doc:parseddocs) {
@@ -68,7 +68,9 @@ public class Main {
                             if(j<100){
                                 tid.setInFirst100Terms(true);
                             }
-                            (stemmedTerms.get(term)).put((String)doc.get(0),tid);
+                            HashMap<String, TermInDoc> map = new HashMap<>();
+                            map.put((String)doc.get(0), tid);
+                            stemmedTerms.put(term,map);
                         }
                         //term appears in hashmap
                         else{
@@ -76,19 +78,26 @@ public class Main {
                             if(stemmedTerms.get(term).containsKey(((String)doc.get(0)))){
                                 (stemmedTerms.get(term)).get((String)doc.get(0)).setTf();
                             }
-                            //if doc doesnt appear in stemmed term
+                            //if doc doesnt appear in stemmed term, create new TermInDoc entry
                             else{
-                                stemmedTerms.get(term).put((String)doc.get(0),new TermInDoc((String)doc.get(0), 1, false))
+                                stemmedTerms.get(term).put((String)doc.get(0),new TermInDoc((String)doc.get(0), 1, false));
+                                if(j<100){
+                                    stemmedTerms.get(term).get((String)doc.get(0)).setInFirst100Terms(true);
+                                }
                             }
                         }
                     }
                 }
 
-                System.out.println("done");
+                //indexer
+                indexer.index(stemmedTerms);
+*/
+             //   System.out.println("done: "+i);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("done");
     }
 
 }

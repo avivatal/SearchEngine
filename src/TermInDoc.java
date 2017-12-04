@@ -1,4 +1,4 @@
-public class TermInDoc {
+public class TermInDoc  {
 
     String DocId;
     int tf;
@@ -42,5 +42,10 @@ public class TermInDoc {
     @Override
     public boolean equals(Object obj) {
         return DocId.equals(((TermInDoc)obj).getDocId());
+    }
+
+    @Override
+    public String toString() {
+        return "("+DocId+" "+tf+" "+String.valueOf(isInFirst100Terms)+")";
     }
 }
