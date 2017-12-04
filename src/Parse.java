@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.lang.String;
 
 /**
  * Created by aviva on 27/11/2017.
  */
 public class Parse {
+
+
 
     ArrayList<ArrayList<String>> parsedDocs;
     HashMap<String, String > months;
@@ -67,6 +70,10 @@ public class Parse {
         months.put("OCTOBER","10");
         months.put("NOVEMBER","11");
         months.put("DECEMBER","12");
+    }
+
+    public ArrayList<ArrayList<String>> getParsedDocs() {
+        return parsedDocs;
     }
 
     public void parse(ArrayList<String> rfDocs, HashSet<String> stopwords){
