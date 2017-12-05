@@ -60,7 +60,7 @@ public class Parse {
     }
 
     public void split(String text, int i) {
-        String[] splited = text.split(" |\\-|\\\n|\\(|\\)|\\;|\\:|\\?|\\!|\\<|\\>|\\}|\\{|\\]|\\[|\\*|\\+|\\||\\\"|\\=");
+        String[] splited = text.split("\\-|\\s+|\\\n|\\(|\\)|\\;|\\:|\\?|\\!|\\<|\\>|\\}|\\{|\\]|\\[|\\*|\\+|\\||\\\"|\\=");
         //String replacer = regex.matcher(text)..replaceAll(" ");
      //   String[] splited = regex.split(text);
 
@@ -443,13 +443,13 @@ public class Parse {
         }
 
         //remove apostrophe
-        if(s.endsWith("'s") || s.endsWith("'S")){
-            s=s.substring(0,s.length()-2);
-        }
-        if(isNumeric(s) ) {
-            if (s.endsWith("f") || s.endsWith("d") || s.endsWith("D") || s.endsWith("F")) {
-                s = s.substring(0, s.length() - 1);
+            if(s.endsWith("'s") || s.endsWith("'S")){
+                s=s.substring(0,s.length()-2);
             }
+            if(isNumeric(s) ) {
+                if (s.endsWith("f") || s.endsWith("d") || s.endsWith("D") || s.endsWith("F")) {
+                    s = s.substring(0, s.length() - 1);
+                }
             if (s.endsWith(".d") || s.endsWith(".D")) {
                 s = s.substring(0, s.length() - 2);
             }

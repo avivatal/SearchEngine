@@ -1,65 +1,46 @@
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-/**
- * Created by aviva on 27/11/2017.
- */
-public class Main {
+public class Controller {
 
-    public static void main(String[] args){
+    HashSet<String> stopwords = new HashSet<String>();
+    Parser parser;
+    Stemmer stemmer;
+    Indexer indexer;
 
-        String corpusPath="C:/Users/talshemt/Downloads/corpus";
-        String stopwordsPath="C:/Users/talshemt/Downloads/stop_words.txt";
-     /*   File corpusFolder = new File(corpusPath);
-        File[] listOfFiles = corpusFolder.listFiles();
-
-        //stop words
-        HashSet<String> stopwords = new HashSet<String>();
-        try{
+    Controller(String stopwordsPath) {
+         parser = new Parser();
+         stemmer = new Stemmer();
+         indexer = new Indexer();
+        try {
             BufferedReader br = new BufferedReader(new FileReader(stopwordsPath));
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
-            while(line!=null){
+            while (line != null) {
                 stopwords.add(line);
-                line=br.readLine();
+                line = br.readLine();
             }
-        }
-
-        catch(Exception e){
+            br.close();
+        } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
+    }
 
-        //read files from corpus
-        try{
-        ReadFile rf = new ReadFile(stopwordsPath);
-        rf.read(corpusPath);}
-        catch (Exception e){
-            e.printStackTrace();}
-     /*   Parser parser = new Parser();
-        Stemmer stemmer = new Stemmer();
-        Indexer indexer = new Indexer();
+    public void control(ArrayList<String> documents) {
 
-        for(int i=0; i<listOfFiles.length; i++) {
 
-            try {
-                //read file, return list of docs in file
-                String path = listOfFiles[i].getPath()+"/"+listOfFiles[i].getName();
-                ArrayList<String> extractDocs = rf.read(path);
+        //parse docs in current file
+        parser.parse(documents, stopwords);
+        HashMap<String, ArrayList<String>> parseddocs = parser.getParsedDocs();
 
-                //parse docs in current file
-                parser.parse(extractDocs,stopwords);
-                ArrayList<ArrayList<String>> parseddocs=parser.getParsedDocs();
-/*
-                //stem
+             /*   //stem
                 //stemmedTerms - for each term we save a map of docs and properties of term in that doc
                 HashMap<String, HashMap<String,TermInDoc>> stemmedTerms = new HashMap<>();
                 //iterate over all docs in file
-                for (ArrayList doc:parseddocs) {
+                for (ArrayList doc:parseddocs.values()) {
                     //stem each word in doc
                     for (int j=1;j<doc.size();j++){
                         stemmer.add(((String)(doc.get(j))).toCharArray(),((String)(doc.get(j))).length());
@@ -95,10 +76,10 @@ public class Main {
 
                 //indexer
                 indexer.index(stemmedTerms);
+
 */
 
-
         System.out.println("done");
-    }
 
+    }
 }
