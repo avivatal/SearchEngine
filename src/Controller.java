@@ -36,7 +36,7 @@ public class Controller {
         parser.parse(documents, stopwords);
         HashMap<String, ArrayList<String>> parseddocs = parser.getParsedDocs();
 
-             /*   //stem
+               //stem
                 //stemmedTerms - for each term we save a map of docs and properties of term in that doc
                 HashMap<String, HashMap<String,TermInDoc>> stemmedTerms = new HashMap<>();
                 //iterate over all docs in file
@@ -77,9 +77,13 @@ public class Controller {
                 //indexer
                 indexer.index(stemmedTerms);
 
-*/
+
 
         System.out.println("done");
 
+    }
+
+    public void merge(){
+        indexer.mergeTempPostings();
     }
 }

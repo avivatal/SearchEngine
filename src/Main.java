@@ -13,8 +13,8 @@ public class Main {
 
     public static void main(String[] args){
 
-        String corpusPath="C:/Users/talshemt/Downloads/corpus";
-        String stopwordsPath="C:/Users/talshemt/Downloads/stop_words.txt";
+        String corpusPath="C:/Users/talshemt/Downloads/corpus/corpus";
+        String stopwordsPath="C:/Users/talshemt/Downloads/corpus/stop_words";
      /*   File corpusFolder = new File(corpusPath);
         File[] listOfFiles = corpusFolder.listFiles();
 

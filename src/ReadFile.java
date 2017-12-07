@@ -6,6 +6,7 @@ import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * Created by aviva on 27/11/2017.
@@ -13,9 +14,11 @@ import java.util.Scanner;
 public class ReadFile
 {
     Controller ctrl;
+    Pattern regex;
 
     public ReadFile(String stopwordsPath) {
         ctrl = new Controller(stopwordsPath);
+        regex = Pattern.compile("<DOC>");
     }
 
     public void read(String corpusPath) throws FileNotFoundException{
@@ -26,9 +29,9 @@ public class ReadFile
         File[] listOfFiles = corpusFolder.listFiles();
         int corpusSize = listOfFiles.length;
 
-        while(counter<corpusSize){
+        while(counter<5){
             documents.clear();
-            for(int i=0; i<50 && counter<corpusSize; i++){
+            for(int i=0; i<1 && counter<corpusSize; i++){
                 String path= listOfFiles[counter].getPath()+"/"+listOfFiles[counter].getName();
                 BufferedReader br = new BufferedReader(new FileReader(path));
                 StringBuilder builder = new StringBuilder();
@@ -40,7 +43,8 @@ public class ReadFile
                     br.close();
                 } catch (Exception e){e.printStackTrace();}
 
-                String[] docs = (builder.toString()).split("<DOC>");
+                //String[] docs = (builder.toString()).split("<DOC>");
+                String[] docs = regex.split(builder.toString());
                 for (int j=1; j<docs.length; j++) {
                     documents.add(docs[j]);
                 }
@@ -50,6 +54,7 @@ public class ReadFile
             ctrl.control(documents);
             System.out.println("done "+counter);
         }
+        ctrl.merge();
 
     }
 
