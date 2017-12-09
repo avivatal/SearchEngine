@@ -61,7 +61,7 @@ public class Parser {
         //String[] splited = text.split("\\-+|\\s+|\\\n+|\\(+|\\)+|\\;+|\\:+|\\?+|\\!+|\\<+|\\>+|\\}+|\\{+|\\]+|\\[+|\\*+|\\++|\\|+|\\\"+|\\=+|\\\\+");
         String[] splited = regex.split(text);
 
-        int splitedlen=splited.length;
+        int splitedlen = splited.length;
 
         for (int j = 0; j < splitedlen; j++) {
 
@@ -219,59 +219,61 @@ public class Parser {
 
 
                     //if NEXT string is month
+                    String tmp = "";
                     if (splitedlen > j + 1) {
-                        String tmp = cleanFromStart(cleanFromEnd(splited[j + 1]));
-                        ;
-                        if (months.containsKey(tmp)) {
+                        tmp = cleanFromStart(cleanFromEnd(splited[j + 1]));
+                    }
 
-                            splited[j + 1] = tmp; //cleaned
+                    if (months.containsKey(tmp)) {
 
-                            //DDth MONTH YYYY -> DD/MM/YYYY
-                            if (splitedj > 2 && splitedStringj.substring(splitedj - 2).equals("th")) { //if current string ends with 'th'
-                                if (isNumeric(splitedStringj.substring(0, splitedj - 2))) { //check if its numeric without the 'th'
-                                    splited[j] = splitedStringj.substring(0, splitedj - 2); //remove the 'th'
+                        splited[j + 1] = tmp; //cleaned
+
+                        //DDth MONTH YYYY -> DD/MM/YYYY
+                        if (splitedj > 2 && splitedStringj.substring(splitedj - 2).equals("th")) { //if current string ends with 'th'
+                            if (isNumeric(splitedStringj.substring(0, splitedj - 2))) { //check if its numeric without the 'th'
+                                splited[j] = splitedStringj.substring(0, splitedj - 2); //remove the 'th'
+                                splitedStringj = splited[j];
+                                splitedj -= 2;
+                            }
+                        }
+                        if (isNumeric(splitedStringj)) {
+                            if (!splitedStringj.contains(".") && Integer.parseInt(splitedStringj) > 0 && Integer.parseInt(splitedStringj) < 32) { //check if day
+                                //add zero if D and not DD
+                                if (splitedj == 1) {
+                                    splited[j] = "0" + splitedStringj;
                                     splitedStringj = splited[j];
-                                    splitedj -= 2;
+                                }
+                                //check for year
+                                String temp = "";
+                                if (splitedlen > j + 2) {
+                                    temp = cleanFromStart(cleanFromEnd(splited[j + 2]));
+                                    ;
+                                }
+                                if (splitedlen > j + 2 && isNumeric(temp) && temp.length() == 4) {
+                                    splited[j + 2] = temp;
+                                    //save as date - DD MONTH YYYY -> DD/MM/YYYY
+                                    parsedDocs.get(i).add(splitedStringj + "/" + months.get(splited[j + 1]) + "/" + splited[j + 2]);
+                                    j += 2;
+                                }
+                                //if year is written in short (YY)
+                                else if (splitedlen > j + 2 && isNumeric(temp) && temp.length() == 2) {
+                                    //save as date - DD MONTH YY -> DD/MM/YYYY
+                                    splited[j + 2] = temp;
+                                    parsedDocs.get(i).add(splitedStringj + "/" + months.get(splited[j + 1]) + "/" + "19" + splited[j + 2]);
+                                    j += 2;
+                                } else {
+                                    //save as date - DD MONTH -> DD/MM
+                                    parsedDocs.get(i).add(splitedStringj + "/" + months.get(splited[j + 1]));
+                                    j++;
                                 }
                             }
-                            if (isNumeric(splitedStringj)) {
-                                if (!splitedStringj.contains(".") && Integer.parseInt(splitedStringj) > 0 && Integer.parseInt(splitedStringj) < 32) { //check if day
-                                    //add zero if D and not DD
-                                    if (splitedj == 1) {
-                                        splited[j] = "0" + splitedStringj;
-                                        splitedStringj = splited[j];
-                                    }
-                                    //check for year
-                                    String temp = "";
-                                    if (splitedlen > j + 2) {
-                                        temp = cleanFromStart(cleanFromEnd(splited[j + 2]));
-                                        ;
-                                    }
-                                    if (splitedlen > j + 2 && isNumeric(temp) && temp.length() == 4) {
-                                        splited[j + 2] = temp;
-                                        //save as date - DD MONTH YYYY -> DD/MM/YYYY
-                                        parsedDocs.get(i).add(splitedStringj + "/" + months.get(splited[j + 1]) + "/" + splited[j + 2]);
-                                        j += 2;
-                                    }
-                                    //if year is written in short (YY)
-                                    else if (splitedlen > j + 2 && isNumeric(temp) && temp.length() == 2) {
-                                        //save as date - DD MONTH YY -> DD/MM/YYYY
-                                        splited[j + 2] = temp;
-                                        parsedDocs.get(i).add(splitedStringj + "/" + months.get(splited[j + 1]) + "/" + "19" + splited[j + 2]);
-                                        j += 2;
-                                    } else {
-                                        //save as date - DD MONTH -> DD/MM
-                                        parsedDocs.get(i).add(splitedStringj + "/" + months.get(splited[j + 1]));
-                                        j++;
-                                    }
-                                }
-                            } else { //current word isnt connected to a date, save it
-                                if (!stopwords.contains(splitedStringj)) {
-                                    parsedDocs.get(i).add(splitedStringj.toLowerCase());
-                                }
+                        } else { //current word isnt connected to a date, save it
+                            if (!stopwords.contains(splitedStringj)) {
+                                parsedDocs.get(i).add(splitedStringj.toLowerCase());
                             }
                         }
                     }
+
                     //***********END DATES CHECK*****************
 
                     //***********NUMBERS***************
@@ -370,8 +372,8 @@ public class Parser {
                 }
             }
         }
-
     }
+
 
 
 

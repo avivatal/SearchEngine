@@ -29,27 +29,33 @@ public class ReadFile
         File[] listOfFiles = corpusFolder.listFiles();
         int corpusSize = listOfFiles.length;
 
-        while(counter<5){
+        while(counter<corpusSize){
             documents.clear();
-            for(int i=0; i<1 && counter<corpusSize; i++){
-                String path= listOfFiles[counter].getPath()+"/"+listOfFiles[counter].getName();
-                BufferedReader br = new BufferedReader(new FileReader(path));
-                StringBuilder builder = new StringBuilder();
-                String aux = "";
+            for(int i=0; i<100 && counter<corpusSize; i++){
                 try {
-                    while ((aux = br.readLine()) != null) {
-                        builder.append(aux);
+                    String path = listOfFiles[counter].getPath() + "/" + listOfFiles[counter].getName();
+                    BufferedReader br = new BufferedReader(new FileReader(path));
+                    StringBuilder builder = new StringBuilder();
+                    String aux = "";
+                    try {
+                        while ((aux = br.readLine()) != null) {
+                            builder.append(aux);
+                        }
+                        br.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    br.close();
-                } catch (Exception e){e.printStackTrace();}
 
-                //String[] docs = (builder.toString()).split("<DOC>");
-                String[] docs = regex.split(builder.toString());
-                for (int j=1; j<docs.length; j++) {
-                    documents.add(docs[j]);
+                    //String[] docs = (builder.toString()).split("<DOC>");
+                    String[] docs = regex.split(builder.toString());
+                    for (int j = 1; j < docs.length; j++) {
+                        documents.add(docs[j]);
+                    }
+                    counter++;
                 }
-                counter++;
-
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
             ctrl.control(documents);
             System.out.println("done "+counter);

@@ -1,4 +1,4 @@
-public class TermInDoc  {
+public class TermInDoc implements Comparable {
 
     String DocId;
     int tf;
@@ -47,5 +47,12 @@ public class TermInDoc  {
     @Override
     public String toString() {
         return "("+DocId+" "+tf+" "+String.valueOf(isInFirst100Terms)+")";
+    }
+
+
+    @Override
+    //compared 2 term is doc records according to their TF (smaller tf -> bigger object)
+    public int compareTo(Object o) {
+        return tf-((TermInDoc)o).getTf();
     }
 }
