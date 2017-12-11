@@ -1,5 +1,3 @@
-import javafx.collections.transformation.SortedList;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -36,6 +34,11 @@ public class Indexer {
             //add to cache
             cache.addToCache(entry);
         }
+        //add pointers from dictionairy to cache
+        for(String termInCache : cache.getCache().keySet()){
+            dictionairy.get(termInCache).setPointerToTermInCache(cache.getCache().get(termInCache));
+        }
+
 
         //temp posting file
 
@@ -72,24 +75,11 @@ public class Indexer {
         return first;
     }
 
+    //iterates over the temporary posting files and merges them into final posting files using merge sort.
     public void mergeTempPostings(){
-
         int start=1;
-/*
-        //number of temp posting files is uneven
-        if(numberOfTempPostingFiles%2 ==1)
-        {
-            start=2;
-            //merge first 2 files
-            merge(1,2,numberOfTempPostingFiles+1);
-            File file = new File("C:/Users/talshemt/IdeaProjects/SearchEngine/"+numberOfTempPostingFiles+1+".txt");
-            File file2 = new File("C:/Users/talshemt/IdeaProjects/SearchEngine/"+2+".txt");
-            file.renameTo(file2);
-        }*/
-
         int end=numberOfTempPostingFiles;
         int iterations = (int)(Math.ceil(Math.log10(end)/Math.log10(2))+1); //height of merging tree is ceil(log2(#files))+1
-
 
         //merge levels iterations
         for(int i=1; i<iterations; i++){
@@ -104,11 +94,10 @@ public class Indexer {
                 start = end + 1;
                 end = tmp;
             }
-
         }
-
     }
 
+    //merges one level of the merge sort tree. start index is the lowest file number and end index is the highest file number to be merged in current iteration. nextCounter is the number of the new file to be created
     public int merge(int startIndex, int endIndex, int nextcounter) {
 
         int currentIndex = startIndex; //index of sorted files
@@ -116,12 +105,9 @@ public class Indexer {
         int ans=0;
 
         try {
-        //check if uneven
+        //check if uneven - only rename the last file to the last counter of this iteration
         if((endIndex-startIndex)%2==0){
             int lastFileIndex = nextcounter+((endIndex-startIndex)/2);
-         //   File lastFile = new File("C:/Users/talshemt/IdeaProjects/SearchEngine/"+endIndex+".txt");
-          //  File newLastFile = new File("C:/Users/talshemt/IdeaProjects/SearchEngine/"+lastFileIndex+".txt");
-            //boolean success = lastFile.renameTo(newLastFile);
             Path source = Paths.get("C:/Users/talshemt/IdeaProjects/SearchEngine/"+endIndex+".txt");
             Files.move(source, source.resolveSibling("C:/Users/talshemt/IdeaProjects/SearchEngine/"+lastFileIndex+".txt"));
             endIndex--;
@@ -129,12 +115,13 @@ public class Indexer {
 
         }
 
+        //haven't finished this iteration
             while (currentIndex < endIndex) {
 
-                //CREATE NEW FILE
+                //create new file
                 PrintWriter writer = new PrintWriter((counter++)+".txt", "UTF-8");
 
-                //OPEN FILES TO MERGE
+                //open files to merge
                 File file1=new File("C:/Users/talshemt/IdeaProjects/SearchEngine/"+currentIndex+".txt");
                 File file2=new File("C:/Users/talshemt/IdeaProjects/SearchEngine/"+(currentIndex+1)+".txt");
                 FileReader fileReader1 = new FileReader(file1);
@@ -142,7 +129,7 @@ public class Indexer {
                 BufferedReader reader1=new BufferedReader(fileReader1);
                 BufferedReader reader2=new BufferedReader(fileReader2);
 
-                //READ LINE FROM EACH FILE
+                //read line from each file and compare
                 String line1 = reader1.readLine();
                 String line2 = reader2.readLine();
                 try {
@@ -167,7 +154,7 @@ public class Indexer {
                     System.out.printf(line2);
                 }
 
-                //IF REACHED THE END OF ONLY ONE OF THE FILES - WRITE THE REST OF THE NEXT FILE
+                //if reached the end of only one of the files - write the rest of the other file
                 while(line1!=null){
                     writer.println(line1);
                     line1=reader1.readLine();
@@ -178,7 +165,7 @@ public class Indexer {
                     line2=reader1.readLine();
                 }
 
-                //DELETE OLD FILES AND CLOSE READERS
+                //delete old files and close readers and writers
                 fileReader1.close();
                 fileReader2.close();
                 file1.delete();
@@ -194,9 +181,11 @@ public class Indexer {
             return counter;
         }
 
+        //return the new end index for the next iteration
         return counter-1+ans;
     }
 
+    //last merge - merges 2 posting files into final posting files - 1 file per each letter, and 1 file for non-letters
     public void mergeAlphabetic(int start, int end){
 
         try {

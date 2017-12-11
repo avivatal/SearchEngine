@@ -29,9 +29,9 @@ public class ReadFile
         File[] listOfFiles = corpusFolder.listFiles();
         int corpusSize = listOfFiles.length;
 
-        while(counter<corpusSize){
+        while(counter<5){
             documents.clear();
-            for(int i=0; i<100 && counter<corpusSize; i++){
+            for(int i=0; i<1 && counter<corpusSize; i++){
                 try {
                     String path = listOfFiles[counter].getPath() + "/" + listOfFiles[counter].getName();
                     BufferedReader br = new BufferedReader(new FileReader(path));

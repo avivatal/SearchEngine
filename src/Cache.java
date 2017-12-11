@@ -13,7 +13,7 @@ public class Cache {
 
     public void addToCache(Map.Entry<String, HashMap<String,TermInDoc>> entry){
 
-        int maxCacheSize = 100;
+        int maxCacheSize = 10000;
 
         for(TermInDoc termInDoc : (entry.getValue()).values()){
             //sorts by termInDocs tf value
